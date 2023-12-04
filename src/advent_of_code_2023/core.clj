@@ -5,4 +5,5 @@
 (defn -main
   [& args]
   (println (day-one/part-one))
+  (println (day-one/part-two))
   0)
