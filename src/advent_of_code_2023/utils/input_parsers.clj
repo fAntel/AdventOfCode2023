@@ -4,7 +4,7 @@
 
 (def days-parent-path "src/advent_of_code_2023/days")
 
-(defn create-input-file [day-name]
+(defn compose-input-filename [day-name]
   (io/file days-parent-path (str day-name "_input")))
 
 (defn process-file-by-lines

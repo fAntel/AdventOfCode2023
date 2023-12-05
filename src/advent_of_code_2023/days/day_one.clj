@@ -58,14 +58,14 @@
 (defn part-one
   []
   (input/process-file-by-lines
-   (input/create-input-file "day_one")
+   (input/compose-input-filename "day_one")
    #(find-calibration-value % find-first-digit find-last-digit)
    +))
 
 (defn part-two
   []
   (input/process-file-by-lines
-   (input/create-input-file "day_one")
+   (input/compose-input-filename "day_one")
    #(find-calibration-value
      %
      (fn [s] (find-digit s 0 1 digits-as-str))
