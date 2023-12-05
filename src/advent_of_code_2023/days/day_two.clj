@@ -11,9 +11,9 @@
   [game-lexem]
   (Integer/parseInt (apply str (drop game-prefix-length game-lexem))))
 
-(defn try-to-map
-  [set]
-  (let [cubes-as-strs (str/split set #",")
+(defn try-to-cubes
+  [try-as-str]
+  (let [cubes-as-strs (str/split try-as-str #",")
         cubes-as-pairs (map #(str/split (str/trim %) #" ") cubes-as-strs)
         cubes-list (map (fn [[count colour]] {:colour colour :count (Integer/parseInt count)}) cubes-as-pairs)]
     (reduce (fn [acc entry] (assoc acc (:colour entry) (+ (:count entry) (get acc (:colour entry) 0)))) {} cubes-list)))
@@ -23,8 +23,9 @@
   (and (contains? default-bag-content colour) (<= count (get default-bag-content colour))))
 
 (defn possible-try?
-  [cubes]
-  (every? #(possible-cubes? %) cubes))
+  [try]
+  (let [cubes (try-to-cubes (str/trim try))]
+    (every? #(possible-cubes? %) cubes)))
 
 (defn possible-game?
   [tries]
@@ -32,9 +33,9 @@
 
 (defn game-to-number
   [line]
-  (let [[game-lexem tries-as-str] (str/split line #":")
+  (let [[game-lexem tries-lexem] (str/split line #":")
         game-number (get-game-number game-lexem)
-        tries (map try-to-map (str/split tries-as-str #";"))]
+        tries (str/split tries-lexem #";")]
     (if (possible-game? tries) game-number 0)))
 
 (defn part-one
