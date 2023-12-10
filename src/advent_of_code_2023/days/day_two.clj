@@ -1,7 +1,6 @@
 (ns advent-of-code-2023.days.day-two
   (:require [advent-of-code-2023.utils.input-parsers :as input]
-            [clojure.string :as str])
-  (:gen-class))
+            [clojure.string :as str]))
 
 (def game-prefix-length 5)
 
