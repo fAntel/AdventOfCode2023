@@ -20,11 +20,23 @@
             (if (> y 0) (coords-for-y x (dec y)) #{})
             (if (< y max-y) (coords-for-y x (inc y)) #{}))))
 
+(defn- filter-possible-digits-into-digits-with-coords
+  [map-as-coords possible-digits-coords]
+  (reduce
+   (fn
+     [acc [coord char]]
+     (let [d (Character/digit char 10)]
+       (if
+         (and (>= d 0) (contains? possible-digits-coords coord))
+         (conj acc {coord d})
+         acc)))
+   {}
+   map-as-coords))
+
 (defn- digits-by-line-reducer
-  [acc coord char]
+  [acc coord d]
   (let [x (get coord :x)
         y (get coord :y)
-        d (Character/digit char 10)
         chars (get acc y [])]
     (assoc acc y (conj chars {:x x :d d}))))
 
@@ -77,20 +89,42 @@
   [map-as-lines]
   (let [width (count (first map-as-lines))
         height (count map-as-lines)
-        ;_ (printf "width: %d, height: %d\n" width height)
         map-as-coords (map-to-coords map-as-lines)
         symbols (into {} (filter (fn [[coord char]] (and (not= \. char) (neg? (Character/digit char 10)))) map-as-coords))
-        ;_ (printf "symbols:\n%s\n" symbols)
         possible-digits-coords (set (mapcat (fn [[coord char]] (coord-to-possible-coords-around-a-symbol coord width height)) symbols))
-        ;_ (printf "possible-digits-coords:\n%s\n" possible-digits-coords)
-        digits (into {} (filter (fn [[coord char]] (and (>= (Character/digit char 10) 0) (contains? possible-digits-coords coord))) map-as-coords))
-        ;_ (printf "digits:\n%s\n" digits)
-        ;_ (printf "digits size: %d\n" (count digits))
+        digits (filter-possible-digits-into-digits-with-coords map-as-coords possible-digits-coords)
         digits-by-line (reduce-kv digits-by-line-reducer {} digits)
-        _ (printf "digits-by-line:\n%s\n" digits-by-line)
-        numbers (digits-to-numbers digits-by-line map-as-lines)
-        _ (printf "numbers:\n%s\n" numbers)]
+        numbers (digits-to-numbers digits-by-line map-as-lines)]
     numbers))
+
+(defn- filter-possible-digits-coords-around-a-gear
+  [map-as-coords coords]
+  (reduce
+   (fn [acc coord]
+     (let [c (get map-as-coords coord)
+           d (Character/digit c 10)]
+       (if (>= d 0)
+         (conj acc {coord d})
+         acc)))
+   {}
+   coords))
+
+(defn- calculate-gear-ration-if-possible
+  [gear-coord map-as-lines map-as-coords width height]
+  (let [possible-digits-coords (coord-to-possible-coords-around-a-symbol gear-coord width height)
+        digits-coords          (filter-possible-digits-coords-around-a-gear map-as-coords possible-digits-coords)
+        digits-by-line (reduce-kv digits-by-line-reducer {} digits-coords)
+        numbers-for-possible-grear (digits-to-numbers digits-by-line map-as-lines)]
+    (if (= (count numbers-for-possible-grear) 2) (apply * numbers-for-possible-grear))))
+
+(defn- find-gear-ratios
+  [map-as-lines]
+  (let [width (count (first map-as-lines))
+        height (count map-as-lines)
+        map-as-coords (map-to-coords map-as-lines)
+        possible-gears (filter (fn [[coord char]] (= char \*)) map-as-coords)
+        gear-ratios (map (fn [[coord _]] (calculate-gear-ration-if-possible coord map-as-lines map-as-coords width height)) possible-gears)]
+    (remove nil? gear-ratios)))
 
 (defn part-one
   []
@@ -99,4 +133,5 @@
 
 (defn part-two
   []
-  nil)
+  (let [map-as-lines (input/read-file-into-vector (input/compose-input-filename "day_three"))]
+    (apply + (find-gear-ratios map-as-lines))))
