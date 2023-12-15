@@ -14,3 +14,4 @@ pom.xml.asc
 /.idea/*.iml
 /.idea/misc.xml
 /.idea/modules.xml
+**/*_input
