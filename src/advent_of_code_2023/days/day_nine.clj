@@ -12,17 +12,26 @@
     (last values)
     (+ (last values) (extrapolate (map #(- (last %) (first %)) (partition 2 1 values))))))
 
+(defn- extrapolate-backward
+  [values]
+  (if (every? zero? values)
+    (first values)
+    (- (first values) (extrapolate-backward (map #(- (last %) (first %)) (partition 2 1 values))))))
+
 (defn- find-extrapolated-value
-  [line]
-  (extrapolate (parse-line line)))
+  [line extrapolate-fun]
+  (extrapolate-fun (parse-line line)))
 
 (defn part-one
   []
   (input/process-file-by-lines
    (input/compose-input-filename "day_nine")
-   find-extrapolated-value
+   #(find-extrapolated-value % extrapolate)
    +))
 
 (defn part-two
   []
-  nil)
+  (input/process-file-by-lines
+   (input/compose-input-filename "day_nine")
+   #(find-extrapolated-value % extrapolate-backward)
+   +))
