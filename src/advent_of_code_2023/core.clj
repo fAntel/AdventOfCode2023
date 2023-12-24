@@ -7,7 +7,8 @@
              ;advent-of-code-2023.days.day-six :as day
              ;advent-of-code-2023.days.day-seven :as day
              ;advent-of-code-2023.days.day-eight :as day
-              advent-of-code-2023.days.day-nine :as day])
+             ;advent-of-code-2023.days.day-nine :as day
+              advent-of-code-2023.days.day-ten :as day])
   (:gen-class))
 
 (defn -main
