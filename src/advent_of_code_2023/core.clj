@@ -14,6 +14,6 @@
 
 (defn -main
   [& args]
-  (println (day/part-one))
-  (println (day/part-two))
+  (time (println (day/part-one)))
+  (time (println (day/part-two)))
   0)

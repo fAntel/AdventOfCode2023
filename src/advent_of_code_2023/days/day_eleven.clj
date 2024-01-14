@@ -27,7 +27,9 @@
   (clojure.set/difference (into (sorted-set) (range line-size)) (set (map key galaxies))))
 
 (defn- expand-universe
-  [universe]
+  ([universe]
+   (expand-universe universe 1))
+  ([universe expantion-rate]
   (let [height            (count universe)
         width             (count (first universe))
         galaxies          (universe-to-list-of-galaxies universe height width)
@@ -36,10 +38,10 @@
     (reduce
      (fn [acc {:keys [x y]}]
        (conj acc
-             {:x (+ x (count (subseq columns-to-expand < x)))
-              :y (+ y (count (subseq rows-to-expand < y)))}))
+             {:x (+ x (* (count (subseq columns-to-expand < x)) expantion-rate))
+              :y (+ y (* (count (subseq rows-to-expand < y)) expantion-rate))}))
      #{}
-     galaxies)))
+     galaxies))))
 
 (defn- calculate-taxicab-geometry-distance
   [from to]
@@ -62,4 +64,5 @@
 
 (defn part-two
   []
-  nil)
+  (let [universe (input/read-file-into-vector (input/compose-input-filename "day_eleven"))]
+    (apply + (find-all-path-lengthes (expand-universe universe 999999)))))
